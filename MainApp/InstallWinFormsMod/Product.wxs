@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"><?define WinFormsMod_TargetDir=$(var.WinFormsMod.TargetDir)?><?define PluginInterface_TargetDir=$(var.PluginInterface.TargetDir)?>
+	<Product Id="*" Name="WinFormsModInstaller" Language="1033" Version="1.0.0.0" Manufacturer="Bastiaan" UpgradeCode="372bf3ad-a385-4c34-b822-221356fd0ed4">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+		<MediaTemplate />
+
+		<Feature Id="ProductFeature" Title="WinFormsModInstaller" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+		</Feature>
+    <UIRef Id="WixUI_Minimal" />
+	</Product>
+
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="INSTALLFOLDER" Name="WinFormsMod" />
+			</Directory>
+     <Directory Id="ProgramMenuFolder">
+       <Directory Id="ApplicationProgramsFolder" Name="WinFormsModMain"/>
+     </Directory>
+		</Directory>
+	</Fragment>
+
+  <Fragment>
+    <DirectoryRef Id="ApplicationProgramsFolder">
+      <Component Id="ApplicationShortcut" Guid="0152ad7a-f449-4c30-8c46-62492e667d6f">
+        <Shortcut Id="ApplicationStartMenuShortcut"
+                  Name="WinFormsMod"
+                  Description="modular application test case"
+                  Target="[#WinFormsMod.exe]"
+                  WorkingDirectory="APPLICATIONROOTDIRECTORY"/>
+        <RemoveFolder Id="CleanUpShortCut" Directory="ApplicationProgramsFolder" On="uninstall"/>
+        <RegistryValue Root="HKCU" Key="Software\MyCompany\MyApplicationName" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>
+  </Fragment>
+    
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+			<Component Id="WinFormsMod.exe" Guid="0d6092a6-5d35-49fd-a35e-eec36599be69">
+			  <File Id="WinFormsMod.exe" Name="WinFormsMod.exe" Source="$(var.WinFormsMod_TargetDir)WinFormsMod.exe" />
+			</Component>
+			<Component Id="WinFormsMod.exe.config" Guid="e74e7d32-2d84-451e-83fb-7f03ddc6bcee">
+			  <File Id="WinFormsMod.exe.config" Name="WinFormsMod.exe.config" Source="$(var.WinFormsMod_TargetDir)WinFormsMod.exe.config" />
+			</Component>
+			<Component Id="PluginInterface.dll" Guid="32735c31-63cc-458f-b835-3fcdb03c3ed3">
+			  <File Id="PluginInterface.dll" Name="PluginInterface.dll" Source="$(var.PluginInterface_TargetDir)PluginInterface.dll" />
+			</Component>
+      <ComponentRef Id="ApplicationShortcut" />
+		</ComponentGroup>
+	</Fragment>
+</Wix>

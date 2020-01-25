@@ -33,6 +33,8 @@
 			this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.loadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.exportAsCsvToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.pluginsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.loadToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
 			((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
 			this.menuStrip1.SuspendLayout();
 			this.SuspendLayout();
@@ -49,7 +51,8 @@
 			// menuStrip1
 			// 
 			this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem});
+            this.fileToolStripMenuItem,
+            this.pluginsToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
 			this.menuStrip1.Size = new System.Drawing.Size(800, 24);
@@ -80,6 +83,21 @@
 			this.exportAsCsvToolStripMenuItem.Visible = false;
 			this.exportAsCsvToolStripMenuItem.Click += new System.EventHandler(this.exportAsCsvToolStripMenuItem_Click_1);
 			// 
+			// pluginsToolStripMenuItem
+			// 
+			this.pluginsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.loadToolStripMenuItem1});
+			this.pluginsToolStripMenuItem.Name = "pluginsToolStripMenuItem";
+			this.pluginsToolStripMenuItem.Size = new System.Drawing.Size(58, 20);
+			this.pluginsToolStripMenuItem.Text = "Plugins";
+			// 
+			// loadToolStripMenuItem1
+			// 
+			this.loadToolStripMenuItem1.Name = "loadToolStripMenuItem1";
+			this.loadToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+			this.loadToolStripMenuItem1.Text = "Load";
+			this.loadToolStripMenuItem1.Click += new System.EventHandler(this.loadToolStripMenuItem1_Click);
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -105,6 +123,8 @@
 		private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem loadToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem exportAsCsvToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem pluginsToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem loadToolStripMenuItem1;
 	}
 }
 

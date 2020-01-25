@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"><?define ExportDataPluginLib_TargetDir=$(var.ExportDataPluginLib.TargetDir)?><?define PluginInterface_TargetDir=$(var.PluginInterface.TargetDir)?>
+	<Product Id="*" Name="SideLoadExport" Language="1033" Version="1.0.0.0" Manufacturer="Bastiaan" UpgradeCode="5987b79a-b957-4c9b-870b-4d01abb6f46e">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+		<MediaTemplate />
+
+		<Feature Id="ProductFeature" Title="SideLoadExport" Level="1">
+			<ComponentGroupRef Id="PLUGINS_files" />
+			<ComponentGroupRef Id="INSTALLFOLDER_files" />
+		</Feature>
+    <UIRef Id="WixUI_Minimal" />
+	</Product>
+
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="WinFormsMod">
+          <Directory Id="PLUGINS" Name="Plugins" />
+        </Directory>
+      </Directory>
+		</Directory>
+	</Fragment>
+
+
+  <Fragment>
+    <ComponentGroup Id="INSTALLFOLDER_files" Directory="INSTALLFOLDER">
+      <Component Id="PluginInterface.dll" Guid="1333ad16-fba1-4a66-a2a6-3e496256bf2f">
+        <File Id="PluginInterface.dll" Name="PluginInterface.dll" Source="$(var.PluginInterface_TargetDir)PluginInterface.dll" />
+      </Component>
+      <Component Id="CsvHelper.dll" Guid="92369012-f18d-472c-aa29-7df1abf85b0a">
+        <File Id="CsvHelper.dll" Name="CsvHelper.dll" Source="$(var.ExportDataPluginLib_TargetDir)CsvHelper.dll" />
+      </Component>
+    </ComponentGroup>
+    <ComponentGroup Id="PLUGINS_files" Directory="PLUGINS">
+      <Component Id="ExportDataPluginLib.dll" Guid="014fcabb-aecb-4df5-acc0-da4ca12589a5">
+        <File Id="ExportDataPluginLib.dll" Name="ExportDataPluginLib.dll" Source="$(var.ExportDataPluginLib_TargetDir)ExportDataPluginLib.dll" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

@@ -1,21 +1,4 @@
-﻿// <copyright file="Form1.cs" company="Biomolecular Mass Spectrometry and Proteomics (http://hecklab.com)">
-// This file is part of HeckLib.
-//
-// HeckLib is free software; you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation; either version 2.1 of the License, or
-// (at your option) any later version.
-//
-// HeckLib is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public License
-// along with HeckLib; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-// </copyright>
-
+﻿using PluginInterface;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -23,15 +6,13 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace ModularWinForms
+namespace WinFormsMod
 {
-	/// <summary>
-	/// template for the form class of a windows forms app project.
-	/// </summary>
 	public partial class Form1 : Form
 	{
 		#region Constructor(s)
@@ -49,10 +30,46 @@ namespace ModularWinForms
 		#region Data
 		private Dictionary<DataGridViewColumn, ComboBox> ColumnsAndControls { get; set; } = new Dictionary<DataGridViewColumn, ComboBox>();
 		private DataTable Data { get; set; }
-		private string Path { get; set; }
+		private string FilePath { get; set; }
+		IPlugin plugin;
 		#endregion
 
 		#region Static
+		public void LoadPlugins()
+		{
+			try
+			{
+				OpenFileDialog ofd = new OpenFileDialog();
+				ofd.InitialDirectory = $@"{Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86)}\WinFormsMod\Plugins";
+				ofd.ShowDialog();
+				string dllPath = ofd.FileName;
+				plugin = LoadAssembly(dllPath);
+				if (plugin.Name == "ExportToCsv")
+				{
+					exportAsCsvToolStripMenuItem.Visible = true;
+				}
+			}
+			catch (Exception)
+			{
+				exportAsCsvToolStripMenuItem.Visible = false;
+			}
+		}
+
+		private IPlugin LoadAssembly(string assemblyPath)
+		{
+			string assembly = Path.GetFullPath(assemblyPath);
+			Assembly ptrAssembly = Assembly.LoadFile(assembly);
+			foreach (Type item in ptrAssembly.GetTypes())
+			{
+				if (!item.IsClass) continue;
+				if (item.GetInterfaces().Contains(typeof(IPlugin)))
+				{
+					return (IPlugin)Activator.CreateInstance(item);
+				}
+			}
+			throw new Exception("Invalid DLL, Interface not found!");
+		}
+
 		private static DataTable ParseAsDataTable(string strFilePath, char sep)
 		{
 			DataTable dt = new DataTable();
@@ -91,12 +108,12 @@ namespace ModularWinForms
 			var ofd = new OpenFileDialog();
 			ofd.ShowDialog();
 
-			Path = ofd.FileName;
+			FilePath = ofd.FileName;
 
 			char separator = DetermineSeparator();
 
 			//Parse according to separator
-			Data = ParseAsDataTable(Path, separator);
+			Data = ParseAsDataTable(FilePath, separator);
 
 			dataGridView1.DataSource = Data;
 			if (((DataTable)dataGridView1.DataSource).Rows.Count == 0)
@@ -108,7 +125,7 @@ namespace ModularWinForms
 		private char DetermineSeparator()
 		{
 			// determine if the input table is csv or tsv
-			StreamReader reader = new StreamReader(Path);
+			StreamReader reader = new StreamReader(FilePath);
 
 			// parse the header
 			string header = reader.ReadLine();
@@ -146,5 +163,33 @@ namespace ModularWinForms
 			return separator;
 		}
 		#endregion
+
+		private void exportAsCsvToolStripMenuItem_Click_1(object sender, EventArgs e)
+		{
+			SaveFileDialog saveFileDialog = new SaveFileDialog();
+			saveFileDialog.Filter = "CSV|*.csv";
+			saveFileDialog.Title = "Save a CSV file";
+			saveFileDialog.ShowDialog();
+
+			if (saveFileDialog.FileName == null)
+			{
+				return;
+			}
+
+			bool isFileSaved = plugin.Execute(Data, saveFileDialog.FileName);
+			if (isFileSaved)
+			{
+				MessageBox.Show("The CSV file has been exported with success");
+			}
+			else
+			{
+				MessageBox.Show("The export operation has failed");
+			}
+		}
+
+		private void loadToolStripMenuItem1_Click(object sender, EventArgs e)
+		{
+			LoadPlugins();
+		}
 	}
 }

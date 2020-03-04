@@ -8,15 +8,14 @@ using System.Threading.Tasks;
 
 namespace PluginInterface
 {
-	public interface IPlugin
+	public interface IFormatPlugin
 	{
 		string Name { get; }
 
 		string GetDescription();
 
-		bool Execute(DataTable data, string filePath);
+		DataTable Execute(DataTable data, string[] newNames);
 
 		event EventHandler OnExecute;
 	}
-
 }

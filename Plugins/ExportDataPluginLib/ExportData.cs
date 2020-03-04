@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace ExportDataPluginLib
 {
-	public class ExportData : IPlugin
+	public class ExportData : IExportPlugin
 	{
 		public string Name => "ExportToCsv";
 

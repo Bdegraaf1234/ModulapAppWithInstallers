@@ -82,6 +82,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\source\Source.csproj">
+      <Project>{541792F4-6738-462A-B39E-AF982C77AF16}</Project>
+      <Name>Source</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PluginInterface\PluginInterface.csproj">
       <Project>{14DDE220-3A7F-4129-9DC6-66B5F19DAA42}</Project>
       <Name>PluginInterface</Name>

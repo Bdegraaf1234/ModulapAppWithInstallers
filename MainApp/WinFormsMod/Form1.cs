@@ -1,4 +1,5 @@
 ﻿using PluginInterface;
+using source;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -31,10 +32,9 @@ namespace WinFormsMod
 		private Dictionary<DataGridViewColumn, ComboBox> ColumnsAndControls { get; set; } = new Dictionary<DataGridViewColumn, ComboBox>();
 		private DataTable Data { get; set; }
 		private string FilePath { get; set; }
-		IPlugin plugin;
+		IExportPlugin plugin;
 		#endregion
 
-		#region Static
 		public void LoadPlugins()
 		{
 			try
@@ -55,52 +55,20 @@ namespace WinFormsMod
 			}
 		}
 
-		private IPlugin LoadAssembly(string assemblyPath)
+		private IExportPlugin LoadAssembly(string assemblyPath)
 		{
 			string assembly = Path.GetFullPath(assemblyPath);
 			Assembly ptrAssembly = Assembly.LoadFile(assembly);
 			foreach (Type item in ptrAssembly.GetTypes())
 			{
 				if (!item.IsClass) continue;
-				if (item.GetInterfaces().Contains(typeof(IPlugin)))
+				if (item.GetInterfaces().Contains(typeof(IExportPlugin)))
 				{
-					return (IPlugin)Activator.CreateInstance(item);
+					return (IExportPlugin)Activator.CreateInstance(item);
 				}
 			}
 			throw new Exception("Invalid DLL, Interface not found!");
 		}
-
-		private static DataTable ParseAsDataTable(string strFilePath, char sep)
-		{
-			DataTable dt = new DataTable();
-			using (StreamReader sr = new StreamReader(strFilePath))
-			{
-				string[] headers = sr.ReadLine().Split(sep);
-				foreach (string header in headers)
-				{
-					if (dt.Columns.Contains(header))
-					{
-						MessageBox.Show("multiple columns with the name \"" + header + "\" found. Please rename these columns");
-						return new DataTable();
-					}
-					dt.Columns.Add(header);
-				}
-				while (!sr.EndOfStream)
-				{
-					string[] rows = sr.ReadLine().Split(sep);
-					DataRow dr = dt.NewRow();
-					for (int i = 0; i < headers.Length; i++)
-					{
-						dr[i] = rows[i];
-					}
-
-					dt.Rows.Add(dr);
-				}
-			}
-
-			return dt;
-		}
-		#endregion
 
 		#region events
 		private void loadToolStripMenuItem_Click(object sender, EventArgs e)
@@ -110,57 +78,20 @@ namespace WinFormsMod
 
 			FilePath = ofd.FileName;
 
-			char separator = DetermineSeparator();
-
 			//Parse according to separator
-			Data = ParseAsDataTable(FilePath, separator);
+			try
+			{
+				Data = IO.ParseAsDataTable(FilePath);
+
+			}
+			catch (Exception)
+			{
+				MessageBox.Show("Your input file could not be parsed. Please check for errors.");
+			}
 
 			dataGridView1.DataSource = Data;
 			if (((DataTable)dataGridView1.DataSource).Rows.Count == 0)
-			{
 				return;
-			}
-		}
-
-		private char DetermineSeparator()
-		{
-			// determine if the input table is csv or tsv
-			StreamReader reader = new StreamReader(FilePath);
-
-			// parse the header
-			string header = reader.ReadLine();
-
-			// check which charcter occurs the most
-			Dictionary<char, int> characteroccurance = new Dictionary<char, int>();
-			for (int i = 0; i < header.Length; ++i)
-			{
-				if (header[i] != '\t' && header[i] != ',')
-				{
-					continue;
-				}
-
-				if (!characteroccurance.ContainsKey(header[i]))
-				{
-					characteroccurance.Add(header[i], 0);
-				}
-
-				characteroccurance[header[i]]++;
-			}
-
-			// set the separator
-			char separator = '\t';
-			int maxoccurance = 0;
-			foreach (char chr in characteroccurance.Keys)
-			{
-				if (characteroccurance[chr] > maxoccurance)
-				{
-					maxoccurance = characteroccurance[chr];
-					separator = chr;
-				}
-			}
-
-			reader.Close();
-			return separator;
 		}
 		#endregion
 
